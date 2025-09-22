@@ -88,8 +88,15 @@ public class NumberTriangle {
      *
      */
     public int retrieve(String path) {
-        // TODO implement this method
-        return -1;
+        NumberTriangle current = this;
+        for (char direction : path.toCharArray()) {
+            if (direction == 'l') {
+                current = current.left;
+            } else if (direction == 'r') {
+                current = current.right;
+            }
+        }
+        return current.root;
     }
 
     /** Read in the NumberTriangle structure from a file.
@@ -108,27 +115,35 @@ public class NumberTriangle {
         // are more convenient to work with when reading the file contents.
         InputStream inputStream = NumberTriangle.class.getClassLoader().getResourceAsStream(fname);
         BufferedReader br = new BufferedReader(new InputStreamReader(inputStream));
-
-
         // TODO define any variables that you want to use to store things
 
         // will need to return the top of the NumberTriangle,
         // so might want a variable for that.
-        NumberTriangle top = null;
 
+        NumberTriangle[][] rows = new NumberTriangle[100][];
+        int rowCount = 0;
+        
         String line = br.readLine();
         while (line != null) {
-
-            // remove when done; this line is included so running starter code prints the contents of the file
-            System.out.println(line);
-
-            // TODO process the line
-
-            //read the next line
+            String[] numbers = line.trim().split("\\s+");
+            
+            rows[rowCount] = new NumberTriangle[numbers.length];
+            for (int i = 0; i < numbers.length; i++) {
+                rows[rowCount][i] = new NumberTriangle(Integer.parseInt(numbers[i]));
+            }
+            
+            if (rowCount > 0) {
+                for (int i = 0; i < rows[rowCount - 1].length; i++) {
+                    rows[rowCount - 1][i].setLeft(rows[rowCount][i]);
+                    rows[rowCount - 1][i].setRight(rows[rowCount][i + 1]);
+                }
+            }
+            
+            rowCount++;
             line = br.readLine();
         }
         br.close();
-        return top;
+        return rows[0][0];
     }
 
     public static void main(String[] args) throws IOException {
